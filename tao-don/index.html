@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo đơn thuê xe | VRP/Go</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="logo">VRP / <span>Go</span></a>
+            <nav class="navbar">
+                <ul class="nav-list">
+                    <li><a href="#">Trang chủ</a></li>
+                    <li><a href="#">Thuê xe</a></li>
+                    <li><a href="#">Cách hoạt động</a></li>
+                    <li><a href="#">Về chúng tôi</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="#" class="btn btn-login">Đăng nhập</a>
+                <a href="#" class="btn btn-register">Đăng ký</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container order-layout">
+
+            <!-- LEFT: Form -->
+            <div class="order-main">
+
+                <!-- Hold timer banner -->
+                <div class="hold-banner" id="hold-banner">
+                    <div class="hold-icon">⏱</div>
+                    <div class="hold-text">
+                        <strong>Đang giữ chỗ cho bạn</strong>
+                        <p>Hoàn tất đơn trong <span id="countdown">10:00</span> để không mất chỗ</p>
+                    </div>
+                    <div class="hold-progress">
+                        <div class="hold-bar" id="hold-bar"></div>
+                    </div>
+                </div>
+
+                <!-- Breadcrumb steps -->
+                <div class="steps-indicator">
+                    <div class="step active"><span>1</span> Thông tin thuê</div>
+                    <div class="step-line"></div>
+                    <div class="step"><span>2</span> Thanh toán</div>
+                    <div class="step-line"></div>
+                    <div class="step"><span>3</span> Xác nhận</div>
+                </div>
+
+                <!-- Vehicle summary -->
+                <section class="card vehicle-summary">
+                    <img src="https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=200&q=80" alt="Honda Vision" class="vehicle-thumb">
+                    <div class="vehicle-info">
+                        <p class="vehicle-type">Xe máy · Tự động</p>
+                        <h2>Honda Vision 2024</h2>
+                        <p class="vehicle-meta">📍 Cầu Giấy, Hà Nội · ★ 4.9 (128)</p>
+                    </div>
+                    <div class="vehicle-price-tag">
+                        <strong>150.000đ</strong>
+                        <span>/ ngày</span>
+                    </div>
+                </section>
+
+                <!-- Rental period (readonly from previous step) -->
+                <section class="card">
+                    <h3 class="card-title">Thời gian thuê</h3>
+                    <div class="period-grid">
+                        <div class="period-item">
+                            <span class="period-label">Nhận xe</span>
+                            <strong id="display-pickup">10/11/2026 · 09:00</strong>
+                        </div>
+                        <div class="period-arrow">→</div>
+                        <div class="period-item">
+                            <span class="period-label">Trả xe</span>
+                            <strong id="display-return">12/11/2026 · 09:00</strong>
+                        </div>
+                        <div class="period-days">
+                            <span id="display-days">2</span> ngày
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Delivery method (FR-16) -->
+                <section class="card">
+                    <h3 class="card-title">Hình thức giao nhận <span class="required">*</span></h3>
+                    <p class="card-desc">Chọn cách bạn muốn nhận và trả xe</p>
+
+                    <div class="delivery-options" id="delivery-options">
+                        <label class="delivery-card">
+                            <input type="radio" name="delivery" value="self" checked>
+                            <div class="delivery-content">
+                                <div class="delivery-icon">🏪</div>
+                                <div>
+                                    <strong>Tự đến lấy tại cửa hàng</strong>
+                                    <p>Đến điểm giao xe của đối tác · Miễn phí</p>
+                                </div>
+                                <span class="delivery-price free">Miễn phí</span>
+                            </div>
+                        </label>
+
+                        <label class="delivery-card">
+                            <input type="radio" name="delivery" value="delivery">
+                            <div class="delivery-content">
+                                <div class="delivery-icon">🚚</div>
+                                <div>
+                                    <strong>Giao xe tận nơi</strong>
+                                    <p>Nhân viên giao xe đến địa chỉ bạn chỉ định</p>
+                                </div>
+                                <span class="delivery-price">+50.000đ</span>
+                            </div>
+                        </label>
+
+                        <label class="delivery-card">
+                            <input type="radio" name="delivery" value="airport">
+                            <div class="delivery-content">
+                                <div class="delivery-icon">✈️</div>
+                                <div>
+                                    <strong>Nhận tại sân bay / ga</strong>
+                                    <p>Gặp mặt tại sảnh đến · Phù hợp khách du lịch</p>
+                                </div>
+                                <span class="delivery-price">+80.000đ</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Address (show when delivery/airport) -->
+                    <div class="address-box" id="address-box" hidden>
+                        <label for="delivery-address">Địa chỉ nhận xe</label>
+                        <input type="text" id="delivery-address" placeholder="Số nhà, đường, phường/xã, quận/huyện...">
+                        <label for="delivery-note" class="mt">Ghi chú địa chỉ (tuỳ chọn)</label>
+                        <input type="text" id="delivery-note" placeholder="VD: Gọi trước 15 phút, gặp tại sảnh A...">
+                    </div>
+                </section>
+
+                <!-- Notes -->
+                <section class="card">
+                    <h3 class="card-title">Ghi chú cho chủ xe</h3>
+                    <p class="card-desc">Yêu cầu đặc biệt, giờ nhận linh hoạt, v.v.</p>
+                    <textarea id="order-note" rows="3" placeholder="VD: Tôi sẽ đến sớm 30 phút, xin chuẩn bị sẵn xe..."></textarea>
+                    <p class="char-count"><span id="note-count">0</span>/300</p>
+                </section>
+
+                <!-- Contact info -->
+                <section class="card">
+                    <h3 class="card-title">Thông tin liên hệ</h3>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <label for="contact-name">Họ và tên <span class="required">*</span></label>
+                            <input type="text" id="contact-name" placeholder="Nguyễn Văn A" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="contact-phone">Số điện thoại <span class="required">*</span></label>
+                            <input type="tel" id="contact-phone" placeholder="0901 234 567" required>
+                        </div>
+                        <div class="form-row full">
+                            <label for="contact-email">Email</label>
+                            <input type="email" id="contact-email" placeholder="email@example.com">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT: Cost summary (sticky) -->
+            <aside class="order-sidebar">
+                <div class="cost-card">
+                    <h3>Bảng chi phí</h3>
+
+                    <div class="cost-lines" id="cost-lines">
+                        <div class="cost-line">
+                            <span>Giá thuê (<span id="cost-days">2</span> ngày)</span>
+                            <strong id="cost-rental">300.000đ</strong>
+                        </div>
+                        <div class="cost-line">
+                            <span>Phí dịch vụ (5%)</span>
+                            <strong id="cost-service">15.000đ</strong>
+                        </div>
+                        <div class="cost-line">
+                            <span>Bảo hiểm cơ bản</span>
+                            <strong id="cost-insurance">30.000đ</strong>
+                        </div>
+                        <div class="cost-line" id="cost-delivery-line" hidden>
+                            <span id="cost-delivery-label">Phí giao nhận</span>
+                            <strong id="cost-delivery">0đ</strong>
+                        </div>
+                    </div>
+
+                    <div class="cost-total">
+                        <span>Tổng thanh toán</span>
+                        <strong id="cost-total">345.000đ</strong>
+                    </div>
+
+                    <p class="cost-note">Chưa bao gồm tiền cọc (nếu chủ xe yêu cầu). Thanh toán khi nhận xe hoặc online ở bước tiếp theo.</p>
+
+                    <button class="btn btn-primary btn-block" id="btn-submit">
+                        Tiếp tục thanh toán
+                    </button>
+
+                    <button class="btn btn-ghost btn-block" id="btn-back">
+                        ← Quay lại chi tiết xe
+                    </button>
+
+                    <div class="secure-note">
+                        🔒 Thông tin của bạn được bảo mật
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+
+</body>
+</html>
